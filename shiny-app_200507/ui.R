@@ -30,9 +30,7 @@ ui <- dashboardPage(skin = 'black',
                                        choices = c('E18', 'P4', 'P14', 'P60', 'P60 + LPS')),
                     checkboxInput('twoway_anova', label = 'Compare Across All Ages (Two-Way Anova)'),
                     checkboxInput('p_vals', label = 'Turn P values ON (For Bar, Violin, and single gene Line plots ONLY)'),
-                    checkboxInput('ind_points', label = 'Turn Individual Points ON'),
-                    htmlOutput('open_target_link'),
-                    htmlOutput('open_target_link2')
+                    checkboxInput('ind_points', label = 'Turn Individual Points ON')
                   ),
                   
                   dashboardBody(
@@ -41,7 +39,12 @@ ui <- dashboardPage(skin = 'black',
                       tabItem(tabName = 'ViolinPlot', plotlyOutput('violin', width = 'auto', height = 'auto')),
                       tabItem('DotPlot', plotlyOutput('dotplot', width = 'auto', height = 'auto')),
                       tabItem('LinePlot', plotlyOutput('line', width = 'auto', height = 'auto')),
-                      tabItem('SummaryDataTable', tableOutput('summary_table')),
+                      tabItem('SummaryDataTable', 
+                              box(tableOutput('summary_table')),
+                              box(htmlOutput('open_target_link')),
+                              box(htmlOutput('open_target_link2')))
+                        
+                        ,
                       tabItem(tabName = 'ANOVATable', tableOutput('anova_table'))))
 )
 

@@ -15,7 +15,6 @@ server <- function (input, output, session) {
   updateSelectInput(session, 'entered_genes', choices = genes)
   
   
-  
   output$bar <- renderPlotly({
     
     

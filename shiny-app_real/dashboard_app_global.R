@@ -1,5 +1,12 @@
 
+##### Load in necessary packages #####
 
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(shinydashboard)
+library(plotly)
+library(shinythemes)
 
 ui <- dashboardPage(skin = 'black',
                 

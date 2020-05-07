@@ -8,24 +8,15 @@ library(shinydashboard)
 library(plotly)
 library(shinythemes)
 
-### Load in the data and generate objects ###
-df <- as_tibble(read.csv('GSE99622_hanamsagar2017_cleaned_melted.csv'))
-df2 <- as_tibble(read.csv('gene_ensembl_ids_opentarget.csv'))
-
-genes <- unique(df$gene)
-std_err <- function(x) sd(x) / sqrt(length(x))
-
-x <- unique(df$age)
 
 
 ui <- dashboardPage(skin = 'black',
                 
-                dashboardHeader(title = 'Microglia Development RNASeq'),
+                dashboardHeader(title = 'Microglia Development RNASeq', titleWidth = 375),
                 
                 dashboardSidebar(
-                    selectizeInput('entered_genes', label = 'Search for one or multiple genes', 
-                                   choices = genes, multiple = TRUE, options = list(maxItems = 5, 
-                                   placeholder = 'Example: Cx3cr1')),
+                    selectizeInput('entered_genes', multiple = TRUE, choices = NULL, label = 'Search for one or multiple genes',
+                                   options = list(maxItems = 5, placeholder = 'Example: Cx3cr1')),
                     sidebarMenu(
                       menuItem('Plots', tabName = 'Plots', icon = icon('bar-chart-o'), startExpanded = FALSE,
                                menuSubItem('Bar Plot', tabName = 'BarPlot'),
@@ -33,10 +24,11 @@ ui <- dashboardPage(skin = 'black',
                                menuSubItem('Line Plot', tabName = 'LinePlot'),
                                menuSubItem('Dot Plot', tabName = 'DotPlot')),
                       menuItem('Info', tabName = "SummaryDataTable", icon = icon('info')),
-                      menuItem('Stats', tabName = 'ANOVATables', icon = icon('th'))
+                      menuItem('Stats', tabName = 'ANOVATable', icon = icon('th'))
                     ),
                     
-                    checkboxGroupInput('checked_groups', label = 'Choose two ages to compare (Two-Way Anova)', choices = x),
+                    checkboxGroupInput('checked_groups', label = 'Choose two ages to compare (Two-Way Anova)', 
+                                       choices = c('E18', 'P4', 'P14', 'P60', 'P60 + LPS')),
                     checkboxInput('twoway_anova', label = 'Compare Across All Ages (Two-Way Anova)'),
                     checkboxInput('p_vals', label = 'Turn P values ON (For Bar, Violin, and single gene Line plots ONLY)'),
                     checkboxInput('ind_points', label = 'Turn Individual Points ON'),
@@ -46,18 +38,26 @@ ui <- dashboardPage(skin = 'black',
                 
                 dashboardBody(
                   tabItems(
-                    tabItem(tabName = 'BarPlot', 
-                            fluidRow(
-                              box(plotlyOutput('bar', width = 'auto', height = 400)))),
-                    tabItem(tabName = 'ViolinPlot', plotlyOutput('violin', width = 'auto', height = 400)),
-                    tabItem('DotPlot', plotlyOutput('dotplot', width = 'auto', height = 400)),
-                    tabItem('LinePlot', plotlyOutput('line', width = 'auto', height = 400)),
+                    tabItem(tabName = 'BarPlot', plotlyOutput('bar', width = 'auto', height = 'auto')),
+                    tabItem(tabName = 'ViolinPlot', plotlyOutput('violin', width = 'auto', height = 'auto')),
+                    tabItem('DotPlot', plotlyOutput('dotplot', width = 'auto', height = 'auto')),
+                    tabItem('LinePlot', plotlyOutput('line', width = 'auto', height = 'auto')),
                     tabItem('SummaryDataTable', tableOutput('summary_table')),
-                    tabItem(tabName = 'ANOVATables', tableOutput('anova_table')))
-                ))
+                    tabItem(tabName = 'ANOVATable', tableOutput('anova_table'))))
+                )
 
 
-server <- function (input, output) {
+server <- function (input, output, session) {
+  
+  ### Load in the data and generate objects ###
+  df <- as_tibble(read.csv('GSE99622_hanamsagar2017_cleaned_melted.csv'))
+  df2 <- as_tibble(read.csv('gene_ensembl_ids_opentarget.csv'))
+  
+  genes <- unique(df$gene)
+  std_err <- function(x) sd(x) / sqrt(length(x))
+  
+  updateSelectInput(session, 'entered_genes', choices = genes)
+  
   
   
   output$bar <- renderPlotly({
@@ -77,7 +77,7 @@ server <- function (input, output) {
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
     
-    p <- ggplot(searched_gene, aes(age, expression, fill = sex:gene))+
+    p <- ggplot(searched_gene, aes(age, expression, fill = interaction(sex, gene)))+
              geom_bar(stat = 'identity', data = searched_gene_grouped, position = position_dodge(.9))+
              geom_errorbar(data = searched_gene_grouped, aes(ymin = expression-sem, ymax = expression + sem), width = 0.2, position=position_dodge(.9))+
              xlab('\r\n Age/Treatment')+
@@ -85,7 +85,7 @@ server <- function (input, output) {
              facet_wrap(~gene)+
              theme_classic()+
              theme(rect = element_rect(fill = 'transparent'), 
-                   text = element_text(size = 20), 
+                   text = element_text(size = 10), 
                    axis.line = element_line(size = 1),
                    axis.ticks = element_line(size = .6),
                    axis.text.x = element_text(angle = 45, hjust = 1),
@@ -132,7 +132,7 @@ server <- function (input, output) {
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
     
-    p <- ggplot(searched_gene, aes(age, expression, fill = sex:gene))+
+    p <- ggplot(searched_gene, aes(age, expression, fill = interaction(sex, gene)))+
               geom_violin(trim = FALSE)+
               xlab('Age/Treatment')+
               ylab('Average Expression')+
@@ -182,8 +182,8 @@ output$line<- renderPlotly({
   searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
   
   p <- ggplot(searched_gene, aes(age, expression, group = sex:gene, linetype = sex))+
-    geom_line(size = 1, data = searched_gene_grouped, aes(age, expression, group = sex:gene, color = gene, linetype = sex))+
-    geom_point(data = searched_gene_grouped, aes(age, expression, group = sex:gene), size = 2, color = 'black')+
+    geom_line(size = 1, data = searched_gene_grouped, aes(age, expression, group = interaction(sex, gene), color = gene, linetype = sex))+
+    geom_point(data = searched_gene_grouped, aes(age, expression, group = interaction(sex, gene)), size = 2, color = 'black')+
     geom_errorbar(data = searched_gene_grouped, aes(ymin = expression-sem, ymax = expression + sem), width = 0.1, color = 'black')+
     xlab('Age/Treatment')+
     ylab('Average Expression')+
@@ -263,6 +263,38 @@ output$summary_table <- renderTable({
   searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
   
   searched_gene_grouped})
+
+output$anova_table <- renderTable({
+  
+  if(input$twoway_anova) {
+    goi = input$entered_genes
+    aov_output <- aov(df[df$gene == goi[1], ]$expression ~ df[df$gene == goi[1], ]$sex + 
+                        df[df$gene == goi[1], ]$age)
+    aov_df <- data.frame(unclass(summary(aov_output)))
+    aov_df['labels'] <- c('sex', 'age', 'Residuals')
+    aov_df['gene'] <- c(goi[1], goi[1], goi[1])
+    aov_df <- aov_df[, c(7, 6, 1, 2, 3, 4, 5)]
+    
+  } else {
+    
+    age_input <- input$checked_groups
+    goi = input$entered_genes
+    
+    df_subset <- df[df$age == age_input[1] | df$age == age_input[2], ]
+    
+    aov_output <- aov(df_subset[df_subset$gene == goi[1], ]$expression ~ df_subset[df_subset$gene == goi[1], ]$sex + 
+                        df_subset[df_subset$gene == goi[1], ]$age)
+    aov_df <- data.frame(unclass(summary(aov_output)))
+    aov_df['labels'] <- c('sex', 'age', 'Residuals')
+    aov_df['gene'] <- c(goi[1], goi[1], goi[1])
+    aov_df['age'] <- c(age_input[1], age_input[2], '')
+    aov_df <- aov_df[, c(8, 7, 6, 1, 2, 3, 4, 5)]
+  }
+  
+  aov_df
+  
+})
+
 
 output$open_target_link <- renderUI({
   

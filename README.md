@@ -1,7 +1,7 @@
 # microglia-seq
 All companion resources for microglia-seq website and data analysis. 
 
-Currently hosted at this URL:  https://bendevlin.shinyapps.io/microglia-seq_shiny_app/
+Currently hosted at this URL:  https://bendevlin.shinyapps.io/shiny-app_200507_test/
 
 Original data published alongside this paper: https://www.ncbi.nlm.nih.gov/pubmed/28618077
 

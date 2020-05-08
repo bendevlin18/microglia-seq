@@ -11,13 +11,31 @@
 
 server <- function (input, output, session) {
   
+  updateSelectizeInput(session, 'entered_genes', choices = genes, server = TRUE)
   
-  updateSelectInput(session, 'entered_genes', choices = genes)
+  output$welcome_info <- 
+    renderUI({
+      c('welcome to the website!')
+      
+      
+    })
+    
   
+  output$summary_table <- renderDT({
+    
+    goi = input$entered_genes
+    
+    searched_gene <- df[df$gene %in% goi,]
+    
+    searched_gene_grouped <- searched_gene %>%
+      group_by(gene, age, sex) %>%
+      summarise(sem = std_err(expression), expression = mean(expression), n = n())
+    
+    searched_gene_grouped})
+  
+
   
   output$bar <- renderPlotly({
-    
-    
     goi = input$entered_genes
     
     searched_gene <- df[df$gene %in% goi,]
@@ -35,26 +53,8 @@ server <- function (input, output, session) {
     p <- ggplot(searched_gene, aes(age, expression, fill = interaction(sex, gene)))+
       geom_bar(stat = 'identity', data = searched_gene_grouped, position = position_dodge(.9))+
       geom_errorbar(data = searched_gene_grouped, aes(ymin = expression-sem, ymax = expression + sem), width = 0.2, position=position_dodge(.9))+
-      xlab('\r\n Age/Treatment')+
-      ylab('Average Expression')+
       facet_wrap(~gene)+
-      theme_classic()+
-      theme(rect = element_rect(fill = 'transparent'), 
-            text = element_text(size = 10), 
-            axis.line = element_line(size = 1),
-            axis.ticks = element_line(size = .6),
-            axis.text.x = element_text(angle = 45, hjust = 1),
-            legend.text = element_text(size = 15),
-            axis.ticks.length = unit(.2, 'cm'),
-            panel.background = element_rect(fill = "transparent"),
-            plot.background = element_rect(fill = "transparent", color = NA),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            legend.background = element_rect(color = NA, col = 0),
-            axis.title.y = element_text(margin = margin(t = 0, r = 75, b = 0, l = 0)),
-            axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0)),
-            strip.background = element_rect(color="transparent", fill="transparent", size=5, linetype="solid"),
-            panel.spacing = unit(1, 'cm'))
+      graph_theme_settings
     
     if (input$p_vals){p <- p + stat_compare_means(method = 't.test', aes(group = sex), label = 'p.format')}
     if (input$p_vals){p <- p + stat_compare_means(method = 't.test', aes(group = age:sex), label = 'p.format')}
@@ -65,14 +65,12 @@ server <- function (input, output, session) {
     # p <- p + stat_compare_means(method = 't.test', comparisons = my_comparison)}
     
     fig <- ggplotly(p)
-    print(fig)
-    
+    fig
+  
   })
   
   
   output$violin <- renderPlotly({
-    
-    
     goi = input$entered_genes
     
     searched_gene <- df[df$gene %in% goi,]
@@ -86,42 +84,22 @@ server <- function (input, output, session) {
     searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    
     p <- ggplot(searched_gene, aes(age, expression, fill = interaction(sex, gene)))+
       geom_violin(trim = FALSE)+
-      xlab('Age/Treatment')+
-      ylab('Average Expression')+
       facet_wrap(~gene)+
-      theme_classic()+
-      theme(rect = element_rect(fill = 'transparent'), 
-            text = element_text(size = 30), 
-            axis.line = element_line(size = 1),
-            axis.ticks = element_line(size = .6),
-            axis.ticks.length = unit(.2, 'cm'),
-            axis.text.x = element_text(angle = 45, hjust = 1),
-            panel.background = element_rect(fill = "transparent"),
-            plot.background = element_rect(fill = "transparent", color = NA),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            legend.background = element_rect(color = NA, col = 0),
-            axis.title.y = element_text(margin = margin(t = 0, r = 15, b = 0, l = 0)),
-            axis.title.x = element_text(margin = margin(t = 30, r = 0, b = 0, l = 0)),
-            strip.background = element_rect(color="transparent", fill="transparent", size=5, linetype="solid"),
-            panel.spacing = unit(1, 'cm'))
+      graph_theme_settings
     
     if (input$p_vals){p <- p + stat_compare_means(method = 't.test', aes(group = sex), label = 'p.format')}
     if (input$ind_points) {p <- p + geom_jitter(position = position_jitterdodge(jitter.width = 0, dodge.width = 0.9), 
                                                 color = 'black', alpha = 0.9)}
     
     fig <- ggplotly(p)
-    print(fig)
+    fig
     
   })
   
   
   output$line<- renderPlotly({
-    
-    
     goi = input$entered_genes
     
     searched_gene <- df[df$gene %in% goi,]
@@ -135,41 +113,20 @@ server <- function (input, output, session) {
     searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    
-    p <- ggplot(searched_gene, aes(age, expression, group = sex:gene, linetype = sex))+
+    p <- ggplot(searched_gene, aes(age, expression, group = interaction(sex, gene), linetype = sex))+
       geom_line(size = 1, data = searched_gene_grouped, aes(age, expression, group = interaction(sex, gene), color = gene, linetype = sex))+
       geom_point(data = searched_gene_grouped, aes(age, expression, group = interaction(sex, gene)), size = 2, color = 'black')+
       geom_errorbar(data = searched_gene_grouped, aes(ymin = expression-sem, ymax = expression + sem), width = 0.1, color = 'black')+
-      xlab('Age/Treatment')+
-      ylab('Average Expression')+
-      theme_classic()+
-      theme(rect = element_rect(fill = 'transparent'), 
-            text = element_text(size = 30), 
-            axis.line = element_line(size = 1),
-            axis.ticks = element_line(size = .6),
-            axis.text.x = element_text(angle = 45, hjust = 1),
-            axis.ticks.length = unit(.2, 'cm'),
-            panel.background = element_rect(fill = "transparent"), # bg of the panel
-            plot.background = element_rect(fill = "transparent", color = NA),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            legend.background = element_rect(color = NA, col = 0),
-            legend.title = element_blank(),
-            axis.title.y = element_text(margin = margin(t = 0, r = 15, b = 0, l = 0)),
-            axis.title.x = element_text(margin = margin(t = 15, r = 0, b = 0, l = 0)),
-            strip.background = element_rect(color="transparent", fill="transparent", size=5, linetype="solid"),
-            panel.spacing = unit(1, 'cm'))
+      graph_theme_settings
     
     if (input$p_vals){p <- p + stat_compare_means(method = 't.test', aes(group = sex), label = 'p.format')}
     
     fig <- ggplotly(p)
-    print(fig)
+    fig
     
   })
   
   output$dotplot<- renderPlotly({
-    
-    
     goi = input$entered_genes
     
     searched_gene <- df[df$gene %in% goi,]
@@ -183,43 +140,23 @@ server <- function (input, output, session) {
     searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    
     mid <- mean(searched_gene_grouped$expression)
     
     p <- ggplot(searched_gene_grouped, aes(x = gene, y = age:sex))+
       geom_point(aes(size = sem, color = expression))+
-      theme_bw()+
       scale_size(range = c(1,15))+
       scale_color_gradient2(midpoint = mid, low = "blue", mid = 'white', high = "red")+
       coord_flip()+
-      theme(
-        text = element_text(face = 'bold', size = 20),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        axis.title.x = element_blank())
+      dotplot_theme
     
     fig <- ggplotly(p)
-    print(fig)
+    fig
     
   })
   
-  output$summary_table <- renderTable({
-    goi = input$entered_genes
-    
-    searched_gene <- df[df$gene %in% goi,]
-    
-    searched_gene_grouped <- searched_gene %>%
-      group_by(gene, age, sex) %>%
-      summarise(sem = std_err(expression), expression = mean(expression), n = n())
-    
-    #reordering the x labels such that they are in chronological order
-    searched_gene$age <- factor(searched_gene$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
-    searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
-    searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
-    searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    
-    searched_gene_grouped})
+
   
-  output$anova_table <- renderTable({
+  output$anova_table <- renderDT({
     
     if(input$twoway_anova) {
       goi = input$entered_genes
@@ -256,8 +193,10 @@ server <- function (input, output, session) {
     goi <- input$entered_genes
     
     url <- a(goi[1], href=df2$ens.id[df2$common.name == goi[1]][1], target = '_blank')
-    
-    tagList('Open Targets Link: ', url)
+    url2 <- a(goi[2], href=df2$ens.id[df2$common.name == goi[2]][1], target = '_blank')
+    url3 <- a(goi[3], href=df2$ens.id[df2$common.name == goi[3]][1], target = '_blank')
+    url4 <- a(goi[4], href=df2$ens.id[df2$common.name == goi[4]][1], target = '_blank')
+    tagList('Open Targets Links: ', list(url, url2, url3, url4))
     
   })
   

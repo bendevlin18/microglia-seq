@@ -1,0 +1,13 @@
+name: shiny-app_200507_test
+title: shiny-app_200507_test
+username:
+account: bendevlin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2262809
+bundleId: 3143914
+url: https://bendevlin.shinyapps.io/shiny-app_200507_test/
+when: 1589402482.88388
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: www/iframeResizer.contentWindow.min.js|www/publication_img.PNG

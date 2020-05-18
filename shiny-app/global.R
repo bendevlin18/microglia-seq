@@ -3,7 +3,7 @@
 ######################################
 ###                                ###
 ###     global.R file for          ###
-###       microglia-seq            ###
+###       microglia-seq            ###a
 ###        application             ###
 ###                                ###
 ######################################
@@ -22,7 +22,7 @@ library(tidyverse)
 
 
 ### Load in the data and generate objects ###
-df <- read.csv('GSE99622_hanamsagar2017_rpkm.csv')
+df <- read.csv('GSE99622_hanamsagar2017_tpm_v2.csv')
 df2 <- readRDS('gene_ensembl_ids_opentarget.rds')
 df3 <- read.csv('unique_data_index.csv')
 df4 <- read.csv('unique_data_index_gene_list.csv')
@@ -33,7 +33,7 @@ std_err <- function(x) sd(x) / sqrt(length(x))
 
 graph_theme_settings <- list(
     xlab('\nAge/Treatment'),
-    ylab('RPKM'),
+    ylab('TPM'),
     theme_classic(),
     theme(rect = element_rect(fill = 'transparent'), 
           text = element_text(size = 13),

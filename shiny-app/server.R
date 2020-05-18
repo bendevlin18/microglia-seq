@@ -31,7 +31,7 @@ server <- function (input, output, session) {
                        the original publication:'),
               tags$h4(pub_url),
               tags$p('The tabs to the left contain interactive visualizations of the microglial developmental index (MDI) presented in the paper. As
-                      well as various plots displaying RPKM values of a list of searched genes (top left search box).'),
+                      well as various plots displaying TPM values of a list of searched genes (top left search box).'),
               tags$p('All output tables can be downloaded as .csv files for additional analysis!'))
     tagList(x)
 
@@ -114,7 +114,7 @@ server <- function (input, output, session) {
     
     searched_gene_grouped <- searched_gene %>%
       group_by(gene, age, sex) %>%
-      summarise(sem = std_err(rpkm), rpkm = mean(rpkm), n = n())
+      summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
     
     
     searched_gene_grouped
@@ -131,7 +131,7 @@ server <- function (input, output, session) {
       
       searched_gene_grouped <- searched_gene %>%
         group_by(gene, age, sex) %>%
-        summarise(sem = std_err(rpkm), rpkm = mean(rpkm), n = n())
+        summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
 
       write.csv(searched_gene_grouped, file)
       
@@ -146,7 +146,7 @@ server <- function (input, output, session) {
     
     searched_gene_grouped <- searched_gene %>%
       group_by(gene, age, sex) %>%
-      summarise(sem = std_err(rpkm), rpkm = mean(rpkm), n = n())
+      summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
     
     #reordering the x labels such that they are in chronological order
     searched_gene$age <- factor(searched_gene$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
@@ -154,9 +154,9 @@ server <- function (input, output, session) {
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
     
-    p <- ggplot(searched_gene, aes(age, rpkm, fill = interaction(sex, gene)))+
+    p <- ggplot(searched_gene, aes(age, TPM, fill = interaction(sex, gene)))+
       geom_bar(stat = 'identity', data = searched_gene_grouped, position = position_dodge(.9))+
-      geom_errorbar(data = searched_gene_grouped, aes(ymin = rpkm-sem, ymax = rpkm + sem), width = 0.2, position=position_dodge(.9))+
+      geom_errorbar(data = searched_gene_grouped, aes(ymin = TPM-sem, ymax = TPM + sem), width = 0.2, position=position_dodge(.9))+
       facet_wrap(~gene)+
       graph_theme_settings
     
@@ -181,14 +181,14 @@ server <- function (input, output, session) {
     
     searched_gene_grouped <- searched_gene %>%
       group_by(gene, age, sex) %>%
-      summarise(sem = std_err(rpkm), rpkm = mean(rpkm), n = n())
+      summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
     
     #reordering the x labels such that they are in chronological order
     searched_gene$age <- factor(searched_gene$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    p <- ggplot(searched_gene, aes(age, rpkm, fill = interaction(sex, gene)))+
+    p <- ggplot(searched_gene, aes(age, TPM, fill = interaction(sex, gene)))+
       geom_violin(trim = FALSE)+
       facet_wrap(~gene)+
       graph_theme_settings
@@ -210,17 +210,17 @@ server <- function (input, output, session) {
     
     searched_gene_grouped <- searched_gene %>%
       group_by(gene, age, sex) %>%
-      summarise(sem = std_err(rpkm), rpkm = mean(rpkm), n = n())
+      summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
     
     #reordering the x labels such that they are in chronological order
     searched_gene$age <- factor(searched_gene$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    p <- ggplot(searched_gene, aes(age, rpkm, group = interaction(sex, gene), linetype = sex))+
-      geom_line(size = 1, data = searched_gene_grouped, aes(age, rpkm, group = interaction(sex, gene), color = gene, linetype = sex))+
-      geom_point(data = searched_gene_grouped, aes(age, rpkm, group = interaction(sex, gene)), size = 2, color = 'black')+
-      geom_errorbar(data = searched_gene_grouped, aes(ymin = rpkm-sem, ymax = rpkm + sem), width = 0.1, color = 'black')+
+    p <- ggplot(searched_gene, aes(age, TPM, group = interaction(sex, gene), linetype = sex))+
+      geom_line(size = 1, data = searched_gene_grouped, aes(age, TPM, group = interaction(sex, gene), color = gene, linetype = sex))+
+      geom_point(data = searched_gene_grouped, aes(age, TPM, group = interaction(sex, gene)), size = 2, color = 'black')+
+      geom_errorbar(data = searched_gene_grouped, aes(ymin = TPM-sem, ymax = TPM + sem), width = 0.1, color = 'black')+
       graph_theme_settings
     
     if (input$p_vals_line){p <- p + stat_compare_means(method = 't.test', aes(group = sex), label = 'p.format')}
@@ -237,17 +237,17 @@ server <- function (input, output, session) {
     
     searched_gene_grouped <- searched_gene %>%
       group_by(gene, age, sex) %>%
-      summarise(sem = std_err(rpkm), rpkm = mean(rpkm), n = n())
+      summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
     
     #reordering the x labels such that they are in chronological order
     searched_gene$age <- factor(searched_gene$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene$sex <- factor(searched_gene$sex, levels = c('Male', 'Female'))
     searched_gene_grouped$age <- factor(searched_gene_grouped$age, levels = c('E18', 'P4', 'P14', 'P60','P60 + LPS'))
     searched_gene_grouped$sex <- factor(searched_gene_grouped$sex, levels = c('Male', 'Female'))
-    mid <- mean(searched_gene_grouped$rpkm)
+    mid <- mean(searched_gene_grouped$TPM)
     
     p <- ggplot(searched_gene_grouped, aes(x = gene, y = age:sex))+
-      geom_point(aes(size = sem, color = rpkm))+
+      geom_point(aes(size = sem, color = TPM))+
       scale_size(range = c(1,15))+
       scale_color_gradient2(midpoint = mid, low = "blue", mid = 'white', high = "red")+
       coord_flip()+
@@ -264,7 +264,7 @@ server <- function (input, output, session) {
     
     if(input$checked_groups == 'All Ages') {
       goi = input$entered_genes
-      aov_output <- aov(df[df$gene == goi[1], ]$rpkm ~ df[df$gene == goi[1], ]$sex * 
+      aov_output <- aov(df[df$gene == goi[1], ]$TPM ~ df[df$gene == goi[1], ]$sex * 
                           df[df$gene == goi[1], ]$age)
       aov_df <- data.frame(unclass(summary(aov_output)))
       aov_df['gene'] <- c(goi[1], goi[1], goi[1], goi[1])
@@ -280,7 +280,7 @@ server <- function (input, output, session) {
       
       df_subset <- df[df$age == age_input[1] | df$age == age_input[2], ]
       
-      aov_output <- aov(df_subset[df_subset$gene == goi[1], ]$rpkm ~ df_subset[df_subset$gene == goi[1], ]$sex * 
+      aov_output <- aov(df_subset[df_subset$gene == goi[1], ]$TPM ~ df_subset[df_subset$gene == goi[1], ]$sex * 
                           df_subset[df_subset$gene == goi[1], ]$age)
       aov_df <- data.frame(unclass(summary(aov_output)))
       aov_df['gene'] <- c(goi[1], goi[1], goi[1], goi[1])
@@ -301,7 +301,7 @@ server <- function (input, output, session) {
     content = function(file) {
     if(input$checked_groups == 'All Ages') {
       goi = input$entered_genes
-      aov_output <- aov(df[df$gene == goi[1], ]$rpkm ~ df[df$gene == goi[1], ]$sex * 
+      aov_output <- aov(df[df$gene == goi[1], ]$TPM ~ df[df$gene == goi[1], ]$sex * 
                           df[df$gene == goi[1], ]$age)
       aov_df <- data.frame(unclass(summary(aov_output)))
       aov_df['gene'] <- c(goi[1], goi[1], goi[1], goi[1])
@@ -315,7 +315,7 @@ server <- function (input, output, session) {
       
       df_subset <- df[df$age == age_input[1] | df$age == age_input[2], ]
       
-      aov_output <- aov(df_subset[df_subset$gene == goi[1], ]$rpkm ~ df_subset[df_subset$gene == goi[1], ]$sex * 
+      aov_output <- aov(df_subset[df_subset$gene == goi[1], ]$TPM ~ df_subset[df_subset$gene == goi[1], ]$sex * 
                           df_subset[df_subset$gene == goi[1], ]$age)
       aov_df <- data.frame(unclass(summary(aov_output)))
       aov_df['gene'] <- c(goi[1], goi[1], goi[1], goi[1])

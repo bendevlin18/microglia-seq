@@ -30,14 +30,27 @@ server <- function (input, output, session) {
               tags$h3('This website contains interactive visualizations of the data presented in
                        the original publication:'),
               tags$h4(pub_url),
+              fluidRow(
+                column(width = 12,
+                       div(style = "height:70px;background-color: transparent;"))),
               tags$p('The tabs to the left contain interactive visualizations of the microglial developmental index (MDI) presented in the paper. As
                       well as various plots displaying TPM values of a list of searched genes (top left search box).'),
-              tags$p('All output tables can be downloaded as .csv files for additional analysis!'))
+              tags$p('All output tables can be downloaded as .csv files for additional analysis!'),
+              fluidRow(
+                column(width = 12,
+                       div(style = "height:100px;background-color: transparent;"))),
+              tags$p('Video Abstract'))
     tagList(x)
 
     
     
   })
+  
+  
+  
+  
+  
+  
   
   
   output$mdi_plot <- renderPlotly({
@@ -116,7 +129,6 @@ server <- function (input, output, session) {
       group_by(gene, age, sex) %>%
       summarise(sem = std_err(TPM), TPM = mean(TPM), n = n())
     
-    
     searched_gene_grouped
     
     })
@@ -164,9 +176,6 @@ server <- function (input, output, session) {
     if (input$p_vals){p <- p + stat_compare_means(method = 't.test', aes(group = age:sex), label = 'p.format')}
     if (input$ind_points) {p <- p + geom_jitter(position = position_jitterdodge(jitter.width = 0, dodge.width = 0.9), 
                                                 color = 'black', alpha = 0.7, shape = 21)}
-    #if (input$checked_groups){
-    # my_comparisons <- list(input$checked_groups)
-    # p <- p + stat_compare_means(method = 't.test', comparisons = my_comparison)}
     
     fig <- ggplotly(p)
     fig
@@ -367,10 +376,35 @@ server <- function (input, output, session) {
     
     github_url <- a('Github', href = 'https://github.com/bendevlin18/microglia-seq', target = '_blank')
     
-    z <- list(tags$h3('All of the code used to analyze the data and produce this website can be found here: ', github_url),
+    z <- list(
+              fluidRow(
+                column(width = 12,
+                       div(style = "height:200px;background-color: transparent;"))),
+              tags$h3('All of the code used to analyze the data and produce this website can be found here: ', tags$a(
+                href='https://github.com/bendevlin18/microglia-seq', 
+                tags$img(src="github-logo.png", title="GitHub Link", width="30", height="30"))),
               tags$p('If you run into any issues or have any questions about the website or the data contained within, contact us!'),
-              tags$p('staci.bilbo@duke.edu'),
-              tags$p('benjamin.devlin@duke.edu'))
+              fluidRow(
+                column(width = 12,
+                       div(style = "height:50px;background-color: transparent;"))),
+              fluidRow(
+                column(width = 2),
+                column(width = 4, 
+                       tags$img(src="staci.jpg", title="Staci Image", width="225", height="231"),
+                       tags$p('Staci Bilbo, Ph.D'),
+                       tags$p('Lab Head'),
+                       tags$a('staci.bilbo@duke.edu')),
+                column(width = 4, 
+                      tags$img(src="ben.png", title="Ben Image", width="225", height="225"),
+                      tags$p('Ben Devlin'),
+                      tags$p('Graduate Student'),
+                      tags$a('benjamin.devlin@duke.edu')),
+                column(width = 2))
+              
+              )
+              
+              
+              
     tagList(z)
     
     

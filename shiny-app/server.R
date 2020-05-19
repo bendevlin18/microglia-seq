@@ -34,12 +34,12 @@ server <- function (input, output, session) {
                 column(width = 12,
                        div(style = "height:70px;background-color: transparent;"))),
               tags$p('The tabs to the left contain interactive visualizations of the microglial developmental index (MDI) presented in the paper. As
-                      well as various plots displaying TPM values of a list of searched genes (top left search box).'),
+                      well as various plots/tables of TPM values from list of searched genes'),
               tags$p('All output tables can be downloaded as .csv files for additional analysis!'),
               fluidRow(
                 column(width = 12,
                        div(style = "height:100px;background-color: transparent;"))),
-              tags$p('Video Abstract'))
+              tags$b('Video Abstract'))
     tagList(x)
 
     
@@ -374,15 +374,13 @@ server <- function (input, output, session) {
   
   output$website_info_text <- renderUI({
     
-    github_url <- a('Github', href = 'https://github.com/bendevlin18/microglia-seq', target = '_blank')
-    
     z <- list(
               fluidRow(
                 column(width = 12,
                        div(style = "height:200px;background-color: transparent;"))),
               tags$h3('All of the code used to analyze the data and produce this website can be found here: ', tags$a(
-                href='https://github.com/bendevlin18/microglia-seq', 
-                tags$img(src="github-logo.png", title="GitHub Link", width="30", height="30"))),
+                href = 'https://github.com/bendevlin18/microglia-seq', target = '_blank',
+                tags$img(src="github-logo.png", title="GitHub", width="25", height="25"))),
               tags$p('If you run into any issues or have any questions about the website or the data contained within, contact us!'),
               fluidRow(
                 column(width = 12,

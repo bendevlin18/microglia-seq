@@ -38,7 +38,7 @@ ui <-  dashboardPage(skin = 'black',
                               class = 'text-center',
                               uiOutput('landing_text'),
                               tags$style("#landing_text{color: black; font-size: 15px;}"),
-                              tags$video(height = '450px', type = 'video/mp4', src='video_abstract.mp4', id = 'video_abstract', controls = 'controls')),
+                              tags$iframe(height = '450px', width = '50%', src='https://www.youtube.com/embed/8UhJ4CvmNgg')),
                       ## https://community.rstudio.com/t/how-to-embed-videos-in-shiny/38937/2
                       
                       

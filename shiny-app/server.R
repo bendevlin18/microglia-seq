@@ -377,7 +377,7 @@ server <- function (input, output, session) {
     z <- list(
               fluidRow(
                 column(width = 12,
-                       div(style = "height:200px;background-color: transparent;"))),
+                       div(style = "height:50px;background-color: transparent;"))),
               tags$h3('All of the code used to analyze the data and produce this website can be found here: ', tags$a(
                 href = 'https://github.com/bendevlin18/microglia-seq', target = '_blank',
                 tags$img(src="github-logo.png", title="GitHub", width="25", height="25"))),

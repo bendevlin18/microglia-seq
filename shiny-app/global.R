@@ -35,7 +35,7 @@ options(spinner.color='#222d32', spinner.color.background = '#ecf0f5', spinner.t
 
 graph_theme_settings <- list(
     xlab('\r\nAge/Treatment'),
-    ylab('TPM\r\n'),
+    ylab('TPM (Transcripts per million) \r\n'),
     theme_classic(),
     theme(rect = element_rect(fill = 'transparent'), 
           text = element_text(size = 13),

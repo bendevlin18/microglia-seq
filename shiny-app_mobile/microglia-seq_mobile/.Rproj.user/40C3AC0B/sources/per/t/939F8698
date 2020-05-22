@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590174342634.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1421810386",
+    "id" : "939F8698",
+    "lastKnownWriteTime" : 1590175057,
+    "last_content_update" : 1590175057812,
+    "path" : "C:/Users/Ben/Dropbox/bilbo_lab_spr2020/microglia-seq_website/microglia-seq/shiny-app/ui.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "112,74",
+        "scrollLine" : "85"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

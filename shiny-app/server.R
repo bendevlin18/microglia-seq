@@ -26,6 +26,8 @@ server <- function (input, output, session) {
                  in mice and in humans reveals a sex difference in 
                  maturation and immune reactivity', href = 'https://onlinelibrary.wiley.com/doi/abs/10.1002/glia.23176', target = '_blank')
     
+    mobile_site_link <- a('MOBILE SITE HERE', href = 'http://microglia-seq.vm.duke.edu/microglia-seq/shiny-app_mobile/', target = '_blank')
+    
     x <- list(tags$h1('Welcome to Microglia-Seq!'),
               tags$h3('This website contains interactive visualizations of the data presented in
                        the original publication:'),
@@ -38,7 +40,11 @@ server <- function (input, output, session) {
               tags$p('All output tables can be downloaded as .csv files for additional analysis!'),
               fluidRow(
                 column(width = 12,
-                       div(style = "height:100px;background-color: transparent;"))),
+                       div(style = "height:50px;background-color: transparent;"))),
+              tags$h3(mobile_site_link),
+              fluidRow(
+                column(width = 12,
+                       div(style = "height:50px;background-color: transparent;"))),
               tags$b('Video Abstract'))
     tagList(x)
 
@@ -368,6 +374,27 @@ server <- function (input, output, session) {
     goi <- input$entered_genes
     url4 <- a(goi[4], href=df2$ens.id[df2$common.name == goi[4]][1], target = '_blank')
     tagList('Open Targets Link Gene #4: ', url4)
+    
+  })
+  
+  output$TPM_info <- renderUI({
+    
+    tpm_url <- a('here', href = 'https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/', target = '_blank')
+    
+    z <- list(
+      tags$h1('What is TPM, anyway?'),
+      tags$h3('TPM stands for Transcript per Million'),
+      tags$h4('It is a normalization method for raw read count RNA-seq data'),
+      fluidRow(
+        column(width = 12,
+               div(style = "height:70px;background-color: transparent;"))),
+      tags$h4('You can read more about this metric', tpm_url),
+      tags$h4('Or, see this useful video explaining how it is calculated, and why it is useful!'))
+      
+
+    tagList(z)
+    
+    
     
   })
 

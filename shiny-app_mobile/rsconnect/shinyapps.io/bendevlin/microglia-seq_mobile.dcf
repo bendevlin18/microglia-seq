@@ -1,0 +1,12 @@
+name: microglia-seq_mobile
+title: microglia-seq_mobile
+username:
+account: bendevlin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2341964
+bundleId: 3179475
+url: https://bendevlin.shinyapps.io/microglia-seq_mobile/
+when: 1590169585.51697
+asMultiple: FALSE
+asStatic: FALSE

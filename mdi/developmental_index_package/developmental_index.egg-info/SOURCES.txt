@@ -1,0 +1,7 @@
+README.md
+developmental_index.py
+setup.py
+developmental_index.egg-info/PKG-INFO
+developmental_index.egg-info/SOURCES.txt
+developmental_index.egg-info/dependency_links.txt
+developmental_index.egg-info/top_level.txt

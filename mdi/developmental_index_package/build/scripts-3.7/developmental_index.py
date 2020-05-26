@@ -107,7 +107,7 @@ def identify_significant_genes(df, young, old):
 
 
 ### housekeeping function for removing rows (genes) that are not developmentally regulated
-def remove_unsignificant_rows(df):
+def remove_insignificant_rows(df):
 
     """
     Housekeeping function for removing rows (genes) that are not developmentally regulated

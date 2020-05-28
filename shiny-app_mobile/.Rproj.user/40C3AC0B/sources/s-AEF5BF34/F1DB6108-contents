@@ -21,11 +21,12 @@ ui <-  f7Page(
     panels = tagList(
       f7Panel(side = "left", theme = "dark", effect = "reveal",
               selectizeInput('entered_genes', multiple = TRUE, choices = NULL, label = 'Search for a gene',
-                             options = list(maxItems = 1, placeholder = 'Example: Cx3cr1')),
+                             options = list(maxItems = 1, placeholder = 'Example: Cx3cr1'))),
+      f7Panel(side = "right", theme = "dark", effect = "reveal",
               f7checkBox('p_vals', label = 'Turn Male/Female Significance Levels ON'),
               f7checkBox('ind_points', label = 'Turn Individual Points ON'))),
     navbar = f7Navbar(
-      title = "Microglia-Seq Mobile", left_panel = TRUE, right_panel = FALSE),
+      title = "Microglia-Seq Mobile", left_panel = TRUE, right_panel = TRUE),
     f7Tabs(
       animated = TRUE, id = 'tabs',
       f7Tab(tabName = "Landing", active = TRUE, icon = f7Icon('home_fill'),

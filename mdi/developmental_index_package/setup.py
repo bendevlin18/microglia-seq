@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'developmental_index',
-    version = '1.4',
+    version = '1.7',
     author = 'Ben Devlin',
     author_email = 'bad36@duke.edu',
-    packages = find_packages('numpy', 'pandas', 'scipy'),
     url = 'https://github.com/bendevlin18/microglia-seq',
-    scripts=["developmental_index.py"]
+    packages = ['developmental_index'],
+    license = 'MIT'
 
 )

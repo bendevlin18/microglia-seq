@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590679208774.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1859280140",
+    "id" : "1E3D75C0",
+    "lastKnownWriteTime" : 1590707383,
+    "last_content_update" : 1590707383528,
+    "path" : "C:/Users/Ben/Desktop/dlc_output/test project-ben-2020-05-21/analysis/plotting_comparisons.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "26,0",
+        "scrollLine" : "10",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

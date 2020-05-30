@@ -1,0 +1,40 @@
+
+
+
+rm(list = ls())
+setwd(choose.dir())
+
+library(tidyverse)
+library(ggpubr)
+library(reshape2)
+
+sem <- function(x) sqrt(var(x)/length(x))
+
+
+### plotting comparison performance on scoring social behavior (hand scoring vs. deeplabcut)
+
+df <- read.csv('invest_times_AC_SOC2_master.csv')
+
+df <- melt(df, measure.vars = c('Somewhere.else', 'X.Investigation', 'Y.Investigation'), variable.name = 'Behavior', value.name = 'Duration')
+
+df <- subset(df, Behavior == 'X.Investigation' | Behavior == 'Y.Investigation')
+
+
+df_grouped <- df %>%
+  group_by(Scoring, Behavior, Type) %>%
+  summarise(sem = sem(Duration), Duration = mean(Duration))
+
+
+ggplot(df, aes(x = interaction(Scoring, Behavior), y = Duration, color = VideoName))+
+  geom_bar(data = df_grouped, stat = 'identity', mapping = aes(x = interaction(Scoring, Behavior), y = Duration, alpha = Scoring), inherit.aes = FALSE)+
+  geom_errorbar(data = df_grouped, aes(x = interaction(Scoring, Behavior), y = Duration, ymin = Duration-sem, ymax = Duration+sem), width = 0.1, inherit.aes = FALSE)+
+  geom_point()+
+  geom_line(data = df, stat = 'identity', mapping = aes(group = interaction(VideoName, Behavior)))+
+  facet_wrap(~Type)+
+  stat_compare_means(data = df, method = 't.test', aes(group = interaction(Scoring, Behavior)), label = 'p.signif')+
+  theme_classic()+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+    
+    
+  )

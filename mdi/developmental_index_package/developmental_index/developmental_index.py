@@ -119,7 +119,11 @@ def remove_insignificant_rows(df):
     import pandas as pd
 
     for gene, series in df.iterrows():
-        if df['direction'][gene] == 'N/A':
+        if df['direction'][gene] == 'UP':
+            pass
+        if df['direction'][gene] == 'DOWN':
+            pass
+        else:
             df.drop(gene, inplace = True)  
     df.reset_index(inplace=True)
     df.rename(columns = {'index' : 'gene'}, inplace = True)
@@ -172,15 +176,20 @@ def generate_index(df, sample_cols):
     samples = sample_cols
     index_per_sample = [0] * len(samples)
     i = -1
-    
+
     ## iterate through the sampels and calculate the index given the index genes
     for sample in samples:
         i = i + 1
-        index_per_sample[i] = np.mean(df[sample][df['direction'] == 'UP']) / np.mean(df[sample][df['direction'] == 'DOWN'])
-        
+        if np.mean(df[sample][df['direction'] == 'UP']) > 0:
+            if np.mean(df[sample][df['direction'] == 'DOWN']) > 0:
+                index_per_sample[i] = np.mean(df[sample][df['direction'] == 'UP']) / np.mean(df[sample][df['direction'] == 'DOWN'])
+            else:
+                pass
+        else:
+            pass
     ## create the output dataframe by stitching this index per sample array to the corresponding sample names    
     final_df = pd.DataFrame([index_per_sample], columns = samples)
-        
+
     return final_df
 
 
@@ -204,3 +213,23 @@ def scale_index(df):
     final_df_scaled.reset_index(inplace = True)
     
     return final_df_scaled
+
+
+### just a quick merge, make sure that the gene column (join_col) from the two input dataframes are labelled correctly
+
+def import_index(df, gene_list_df):
+    
+    """
+    Just a quick merge of the main dataframe and an imported index gene list. Make sure that both dataframes have original gene IDs as the 
+    row indexes.
+
+    Args: Takes main dataframe and dataframe with index genes as the arguments.
+
+    """
+    
+    import numpy as np 
+    import pandas as pd
+
+    output_df = df.join(gene_list_df)
+
+    return output_df

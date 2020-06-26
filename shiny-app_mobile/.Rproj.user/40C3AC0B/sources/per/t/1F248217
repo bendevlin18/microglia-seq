@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592331971860.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1809087222",
+    "id" : "1F248217",
+    "lastKnownWriteTime" : 1592453735,
+    "last_content_update" : 1592453735449,
+    "path" : "C:/Users/Ben/Desktop/dlc_output/social_behavior_all-ben-2020-05-27/analysis/final_analysis_invest_times_200616.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "2,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

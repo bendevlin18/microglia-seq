@@ -139,6 +139,28 @@ server <- function (input, output, session) {
     
     })
   
+  output$data_table <- renderDT({
+    
+    goi = input$entered_genes
+    
+    searched_gene <- df[df$gene %in% goi,]
+    
+    searched_gene
+    
+  })
+  
+  output$data_table_download <- downloadHandler(
+    
+    filename = function() {paste('data_output', '_', list(input$entered_genes), '.csv', sep = '')},
+    content = function(file) {
+      goi = input$entered_genes
+      
+      searched_gene <- df[df$gene %in% goi,]
+      
+      write.csv(searched_gene, file)
+      
+    })
+  
   output$summary_table_download <- downloadHandler(
     
     filename = function() {paste('summary_output', '_', list(input$entered_genes), '.csv', sep = '')},

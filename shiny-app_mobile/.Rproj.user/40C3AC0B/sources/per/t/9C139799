@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592256720254.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2267677533",
+    "id" : "9C139799",
+    "lastKnownWriteTime" : 1592455367,
+    "last_content_update" : 1592455367223,
+    "path" : "C:/Users/Ben/Desktop/dlc_output/social_behavior_all-ben-2020-05-27/analysis/final_analysis_preferences_200615.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "6,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,217 @@
+
+
+##### Final, Cleaned analysis of Hand vs. DLC scoring comparisons #####
+
+
+
+## clearing workspace and setting working directory
+
+rm(list = ls())
+setwd('C:\\Users\\Ben\\Desktop\\dlc_output\\social_behavior_all-ben-2020-05-27\\analysis')
+
+
+
+## importing libraries
+
+library(tidyverse)
+library(ggpubr)
+library(reshape2)
+library(ggbeeswarm)
+
+
+## defining relevant functions
+
+sem <- function(x) sqrt(var(x)/length(x))
+theme_set(theme_bw(base_size = 50)) 
+
+
+## importing data (cleaned and partially analyzed in python)
+
+df <- read.csv('invest_times_master.csv')
+
+## subsetting the data so that we only have variables we are interested in comparing
+
+df <- subset(df, select = c('Videoname', 'Sex', 'Condition', 'type', 'Scoring', 'preference', 'Cohort'))
+
+## setting the level order of some of the variables that contain discrete factors
+
+df$Sex <- factor(df$Sex, levels = c('M', 'F'))
+df$Scoring <- factor(df$Scoring, levels = c('Hand', 'DLC'))
+df$type <- factor(df$type, levels = c('Social', 'Novel'))
+
+
+## plotting overall distribution of preference scores (in a box plot, and then in a violin w/ each video as a point)
+
+ggplot(df, aes(x = Scoring, y = preference, color = Scoring))+
+  geom_boxplot()+
+  geom_quasirandom(size = 2)+
+  ggtitle('Overall Distribution of Preferences\r\n')+
+  theme_classic(base_size = 20)+
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.line = element_line(colour = 'black', size = 2),
+    axis.ticks.length = unit(.4, 'cm'),
+    axis.ticks.x = element_line(colour = 'black', size = 2),
+    axis.ticks.y = element_line(colour = 'black', size = 2),
+    plot.background = element_rect(fill = 'transparent'),
+    panel.background = element_rect(fill = 'transparent'),
+    legend.title = element_blank()
+  )
+
+ggsave('overall_preference_dist_plot.svg', bg = 'transparent')
+
+ggplot(df, aes(x = Scoring, y = preference, color = Scoring))+
+  geom_violin()+
+  geom_quasirandom(aes(x = Scoring, y = preference, color = Videoname))+
+  ggtitle('Overall Distribution of Preferences\r\n')+
+  theme_classic(base_size = 20)+
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.line = element_line(colour = 'black', size = 2),
+    axis.ticks.length = unit(.4, 'cm'),
+    axis.ticks.x = element_line(colour = 'black', size = 2),
+    axis.ticks.y = element_line(colour = 'black', size = 2),
+    plot.background = element_rect(fill = 'transparent'),
+    panel.background = element_rect(fill = 'transparent'),
+    legend.title = element_blank(),
+    legend.position = 'none'
+  )
+
+ggsave('overall_preference_dist2_plot.svg', bg = 'transparent')
+
+
+
+## grouping dataframe by pretty much every variable so that we can graph averages
+
+df_grouped <- df %>%
+  group_by(Sex, Condition, type, Scoring) %>%
+  summarise(sem = sem(preference), preference = mean(preference))
+
+
+## dropping any rows with NaNs
+
+df_grouped <- df_grouped[complete.cases(df_grouped), ]
+
+
+## plotting base comparisons (tx groups / preference) to look for any major differences in outcome
+
+
+ggplot(df_grouped, aes(x = Sex, y = preference, fill = Condition))+
+  geom_hline(yintercept = 50, linetype = 2)+
+  geom_bar(position = 'dodge', stat = 'identity')+
+  geom_errorbar(position=position_dodge(width=0.9), aes(ymin = preference - sem, ymax = preference + sem), width = 0.2)+
+  facet_wrap(~type * Scoring)+
+  ggtitle('Preference Scores by Group \r\n')+
+  theme_classic(base_size = 25)+
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.line = element_line(colour = 'black', size = 2),
+    axis.ticks.length = unit(.4, 'cm'),
+    axis.ticks.x = element_line(colour = 'black', size = 2),
+    axis.ticks.y = element_line(colour = 'black', size = 2),
+    plot.background = element_rect(fill = 'transparent'),
+    panel.background = element_rect(fill = 'transparent'),
+    legend.title = element_blank(),
+    legend.position = 'none'
+  )
+
+ggsave('preferences_by_group_plot.svg', bg = 'transparent', width = 12.5, height = 15, dpi = 300, units = "in",)
+  
+## there is no significant effect of Scoring on preference!
+
+summary(aov(data = df, preference ~ Scoring * Condition * Sex))
+
+
+## I now want to try to make a correlation graph, where hand scoring values are on the X axis, and DLC-scores on the y
+
+hand_prefs <- df[df$Scoring == 'Hand', c('preference', 'Videoname', 'Cohort', 'type')]
+DLC_prefs <- df[df$Scoring == 'DLC', c('preference', 'Videoname', 'Cohort', 'type')]
+
+df_correlation <- merge(DLC_prefs, hand_prefs, by = 'Videoname')
+
+df_correlation <- subset(df_correlation, df_correlation$Cohort.x == 'SOC2')
+
+ggplot(df_correlation, aes(x = preference.x, y = preference.y, color = type.y))+
+  geom_abline(slope = 1, size = 2)+
+  geom_point(size = 4)+
+  xlab('Hand-Scored Preference')+
+  ylab('DLC-Scored Preference')+
+  ggtitle('Correlation Between Preference Scores\r\n')+
+  xlim(0, 100)+
+  ylim(0, 100)+
+  theme_classic(base_size = 20)+
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.line = element_line(colour = 'black', size = 2),
+    axis.ticks.length = unit(.4, 'cm'),
+    axis.ticks.x = element_line(colour = 'black', size = 2),
+    axis.ticks.y = element_line(colour = 'black', size = 2),
+    plot.background = element_rect(fill = 'transparent'),
+    panel.background = element_rect(fill = 'transparent'),
+    legend.title = element_blank()
+  )
+
+ggsave('preference_correlation_plot.svg', bg = 'transparent')
+
+cor.test(df_correlation$preference.x, df_correlation$preference.y)
+
+
+## Now let's plot each individual video preference
+
+df_subset <- subset(df, df$Cohort == 'SOC2')
+
+ggplot(df, aes(x = interaction(Scoring, Sex, Condition), y = preference, color = Videoname, fill = Videoname, group = Videoname, shape = Scoring))+
+  geom_point(size = 4)+
+  geom_hline(yintercept = 50, linetype = 2)+
+  geom_path()+
+  ylim(0, 100)+
+  ggtitle('Video by Video Comparison')+
+  facet_wrap(~type)+
+  theme_bw(base_size = 20)+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5),
+    axis.line = element_line(colour = 'black', size = 2),
+    axis.ticks.length = unit(.4, 'cm'),
+    axis.ticks.x = element_line(colour = 'black', size = 2),
+    axis.ticks.y = element_line(colour = 'black', size = 2),
+    plot.background = element_rect(fill = 'transparent'),
+    panel.background = element_rect(fill = 'transparent'),
+    legend.title = element_blank(),
+    legend.position = 'none'
+  )
+
+ggsave('preferences_by_videoname_ALL_plot.svg', bg = 'transparent', width = 7, height = 7, dpi = 300, units = "in",)
+
+  
+df_dif <- read.csv('differences_200618.csv')
+
+df_dif <- melt(df_dif)
+
+df_dif <- subset(df_dif, df_dif$variable != 'X')
+
+df_dif_grouped <- df_dif %>%
+  group_by(variable) %>%
+  summarise(sem = sem(value), value = mean(value))
+
+ggplot(df_dif, aes(x = variable, y = value, color = variable))+
+  geom_point(data = df_dif_grouped, size = 10, alpha = .4)+
+  geom_quasirandom(size = 4)+
+  theme_bw(base_size = 20)+
+  ggtitle('Differences Per Video\r\n')+
+  xlab('')+
+  ylab('Difference in Preference\r\n')+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5),
+    axis.line = element_line(colour = 'black', size = 2),
+    axis.ticks.length = unit(.4, 'cm'),
+    axis.ticks.x = element_line(colour = 'black', size = 2),
+    axis.ticks.y = element_line(colour = 'black', size = 2),
+    plot.background = element_rect(fill = 'transparent'),
+    panel.background = element_rect(fill = 'transparent'),
+    legend.title = element_blank(),
+    legend.position = 'none'
+  )
+
+ggsave('differences.svg', bg = 'transparent', width = 7, height = 9, dpi = 300, units = "in",)

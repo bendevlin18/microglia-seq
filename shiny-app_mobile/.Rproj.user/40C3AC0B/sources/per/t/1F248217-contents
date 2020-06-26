@@ -1,0 +1,122 @@
+
+
+## clearing workspace and setting working directory
+
+rm(list = ls())
+setwd('C:\\Users\\Ben\\Desktop\\dlc_output\\social_behavior_all-ben-2020-05-27\\analysis')
+
+
+
+## importing libraries
+
+library(tidyverse)
+library(ggpubr)
+library(reshape2)
+library(ggbeeswarm)
+
+
+## defining relevant functions
+
+sem <- function(x) sqrt(var(x)/length(x))
+
+
+## importing data (cleaned and partially analyzed in python)
+
+df <- read.csv('invest_times_master.csv')
+
+## subsetting the data so that we only have variables we are interested in comparing
+
+df <- subset(df, select = c('Videoname', 'Sex', 'Condition', 'type', 'Scoring', 'social_investigation', 'Cohort'))
+
+
+## setting the level order of some of the variables that contain discrete factors
+
+df$Sex <- factor(df$Sex, levels = c('M', 'F'))
+df$Scoring <- factor(df$Scoring, levels = c('Hand', 'DLC'))
+df$type <- factor(df$type, levels = c('Social', 'Novel'))
+
+
+## plotting overall distribution of social_investigation times (in a box plot, and then in a violin w/ each video as a point)
+
+ggplot(df, aes(x = Scoring, y = social_investigation, color = Scoring))+
+  geom_boxplot()+
+  geom_quasirandom()+
+  theme_bw()
+
+ggplot(df, aes(x = Scoring, y = social_investigation, color = Scoring))+
+  geom_violin()+
+  geom_quasirandom(aes(x = Scoring, y = social_investigation, color = Videoname))+
+  theme_classic2()+
+  theme(
+    legend.position = 'none',
+  )
+
+
+
+## grouping dataframe by pretty much every variable so that we can graph averages
+
+df_grouped <- df %>%
+  group_by(Sex, Condition, type, Scoring) %>%
+  summarise(sem = sem(social_investigation), social_investigation = mean(social_investigation))
+
+
+## dropping any rows with NaNs
+
+df_grouped <- df_grouped[complete.cases(df_grouped), ]
+
+
+## plotting base comparisons (tx groups / social_investigation) to look for any major differences in outcome
+
+
+ggplot(df_grouped, aes(x = Sex, y = social_investigation, fill = Condition))+
+  geom_bar(position = 'dodge', stat = 'identity')+
+  geom_errorbar(position=position_dodge(width=0.9), aes(ymin = social_investigation - sem, ymax = social_investigation + sem), width = 0.2)+
+  facet_wrap(~type * Scoring)+
+  theme_bw()+
+  theme(
+    legend.position = 'right'
+  )
+
+
+## there is an effect of Scoring on time!
+
+summary(aov(data = df, social_investigation ~ Scoring))
+
+
+## I now want to try to make a correlation graph, where hand scoring values are on the X axis, and DLC-scores on the y
+
+hand_prefs <- df[df$Scoring == 'Hand', c('social_investigation', 'Videoname', 'Cohort', 'type')]
+DLC_prefs <- df[df$Scoring == 'DLC', c('social_investigation', 'Videoname', 'Cohort', 'type')]
+
+df_correlation <- merge(DLC_prefs, hand_prefs, by = 'Videoname')
+
+df_correlation <- subset(df_correlation, df_correlation$Cohort.x == 'SOC2')
+
+ggplot(df_correlation, aes(x = social_investigation.x, y = social_investigation.y, color = type.x))+
+  geom_abline(slope = 1, size = 2)+
+  geom_point(size = 4)+
+  xlim(0, 100)+
+  ylim(0, 100)+
+  theme_bw()
+
+cor.test(df_correlation$social_investigation.x, df_correlation$social_investigation.y)
+
+
+
+
+## Now let's plot each individual video preference
+
+df_subset <- subset(df, df$Cohort == 'SOC2')
+
+ggplot(df_subset, aes(x = interaction(Scoring, Sex, Condition), y = social_investigation, color = Videoname, fill = Videoname, group = Videoname))+
+  geom_point()+
+  geom_path()+
+  facet_wrap(~type)+
+  ylim(0, 80)+
+  theme_bw()+
+  theme(
+    legend.position = 'none',
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+

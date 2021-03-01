@@ -401,7 +401,7 @@ server <- function (input, output, session) {
   
   output$TPM_info <- renderUI({
     
-    tpm_url <- a('here', href = 'https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/', target = '_blank')
+    tpm_url <- a('here', href = 'https://statquest.org/rpkm-fpkm-and-tpm-clearly-explained/', target = '_blank')
     
     z <- list(
       tags$h1('What is TPM, anyway?'),

@@ -16,6 +16,8 @@ def scale_expression(df):
     import pandas as pd
 
     scaled_expression_df = df
+
+    percent = 0
     
     ## iterating through the rows of the dataframe to scale expression of each gene (by row)
     for row in range(len(scaled_expression_df)):

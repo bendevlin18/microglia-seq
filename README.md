@@ -1,7 +1,7 @@
 # microglia-seq
 All companion resources for microglia-seq website and data analysis. 
 
-Currently hosted at this URL:  http://microglia-seq.com
+Currently hosted at this URL:  http://microgliaseq.com
 
 Original data published alongside this paper: https://www.ncbi.nlm.nih.gov/pubmed/28618077
 
